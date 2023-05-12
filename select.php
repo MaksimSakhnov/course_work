@@ -2,7 +2,19 @@
 
 require('tosql.php');
 
-$sql = 'SELECT * FROM students WHERE department = "Механико-математический факультет"';
+$dep = "Механико-математический факультет";
+
+$chosen_spec = "Прикладная математика и информатика (бакалавр)";
+
+// подразумеваем, что ex2 и ex3 - альтернативные предметы по выбору (например, физика/информатика на мехмат)
+
+$dep_exams = array( // наверное, это нужно грузить из бд с факультетами
+    'Экз1' => "Математика",
+    'Экз2' => "Физика",
+    'Экз3' => "Информатика и ИКТ",
+);
+
+$sql = "SELECT * FROM students WHERE spec = '{$chosen_spec}'";
 
 
 $result = mysqli_query($link, $sql);
@@ -15,15 +27,15 @@ if($result->num_rows > 0){
             <th>ФИО</th>
             <th>Сумма баллов</th>
             <th>Русский язык</th>
-            <th>Экз1</th>
-            <th>Экз2</th>
-            <th>Экз3</th>
+            <th>{$dep_exams['Экз1']}</th>
+            <th>{$dep_exams['Экз2']}</th>
+            <th>{$dep_exams['Экз3']}</th>
             <th>Инд. достиж</th>
             <th>Оригинал</th>
             <th>Приоритет</th>
             <th>Другие направления</th>
             </tr>";
-    while($student = $result->fetch_assoc()){
+    while ($student = $result->fetch_assoc()){
 
         echo "<tr>
             <td>".$student["fio"],"</td>";
@@ -36,28 +48,38 @@ if($result->num_rows > 0){
         $ex3_ball = 0;
         $individual_ball = 0;
         $exam_result = mysqli_query($link, $sql);
-        if($exam_result->num_rows > 0){
-            while($exam = $exam_result->fetch_assoc()){
-                $sum += (int)$exam['spec'];
-                if($exam['subject'] = "Русский язык"){
-                    $rus_ball = intval($exam['spec']);
-                }
-                else if($exam['subject'] = "Индивидуальные достижения"){
-                    $individual_ball = (int)$exam['spec'];
-                }
-                else{
-                    if($ex1_ball === 0){
-                        $ex1_ball = (int)$exam['spec'];
-                    }
-                    else if($ex2_ball === 0){
-                        $ex2_ball = (int)$exam['spec'];
-                    }
-                    else{
-                        $ex3_ball =(int) $exam['spec'];
-                    }
+        if ($exam_result->num_rows > 0){
+            while ($exam = $exam_result->fetch_assoc()){
+                $ball = (int)$exam['spec'];
+                switch($exam['subject']){
+                    case "Русский язык":
+                        $rus_ball = $ball;
+                        $sum += $ball;
+                        break;
+                    case "Индивидуальные достижения":
+                        $individual_ball = $ball;
+                        $sum += $ball;
+                        break;
+                    case $dep_exams['Экз1']:
+                        $ex1_ball = $ball;
+                        $sum += $ball;
+                        break;
+                    case $dep_exams['Экз2']:
+                        $ex2_ball = $ball;
+                        $sum += $ball;
+                        break;
+                    case $dep_exams['Экз3']:
+                        $ex3_ball = $ball;
+                        $sum += $ball;
+                        break;
+                    default:
+                        break;
                 }
             }
         }
+
+        $sum -= min($ex2_ball, $ex3_ball); // чтобы не было суммы 4 предметов
+
         echo "<td>".$sum, "</td>",
         "<td>".$rus_ball, "</td>",
         "<td>".$ex1_ball, "</td>",
@@ -66,8 +88,18 @@ if($result->num_rows > 0){
         "<td>".$individual_ball, "</td>";
 
         echo "<td>".$student["orig"],"</td>",
-        "<td>".$student["priorr"],"</td>",
-        "<td> </td>";
+        "<td>".$student["priorr"],"</td>";
+
+        // специальности
+        echo "<td>";
+        $sql = "SELECT * FROM students WHERE code = '{$student['code']}'";
+        $student_specs = mysqli_query($link, $sql);
+        if ($student_specs->num_rows > 0){
+            while ($student = $student_specs->fetch_assoc()){
+                echo $student['spec'] . "<br>";
+            }
+        }
+        echo "</td>";
 
         echo "</tr>";
     }
