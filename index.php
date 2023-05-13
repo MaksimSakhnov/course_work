@@ -64,7 +64,7 @@ if (file_exists('29072021.xml')) {
         $profSubject = $chel['Профиль']['ПрофПредмет'];
         $department = $chel['Факультет'];
         $return = ($chel['Возврат'] == "true") ? true : false;
-        $sql = "INSERT INTO students VALUES ('$fio', '$code', '$spec', '$codeSpec', '$form', '$studyForm', '$payForm', '$prior', '$orig', '$profName', '$profCode', '$prof', '$osnovanie', '$profSubject', '$department', '$return')";
+        $sql = "INSERT INTO students VALUES ('$fio', '$code', '$spec', '$form', '$codeSpec', '$studyForm', '$payForm', '$prior', '$orig', '$profName', '$profCode', '$prof', '$osnovanie', '$profSubject', '$department', '$return')";
         mysqli_query($link, $sql);
 
     }

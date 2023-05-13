@@ -17,19 +17,19 @@ $conn->query($sql);
 $sql = 'CREATE TABLE IF NOT EXISTS students(
     fio VARCHAR(50) NOT NULL,
     code VARCHAR(50) NOT NULL,
-    spec VARCHAR(50) NOT NULL,
+    spec VARCHAR(80) NOT NULL,
     form VARCHAR(50) NOT NULL,
     codeSpec VARCHAR(50) NOT NULL,
     studyForm VARCHAR(50) NOT NULL,
     payForm VARCHAR(50) NOT NULL,
     priorr  INT NOT NULL,
     orig BOOLEAN NOT NULL,
-    profName VARCHAR(50) NOT NULL,
+    profName VARCHAR(100) NOT NULL,
     profCode VARCHAR(50) NOT NULL,
-    prof VARCHAR(50) NOT NULL,
+    prof VARCHAR(80) NOT NULL,
     osnovanie VARCHAR(50) NOT NULL,
-    profSubject VARCHAR(50) NOT NULL,
-    department VARCHAR(50) NOT NULL,
+    profSubject VARCHAR(60) NOT NULL,
+    department VARCHAR(80) NOT NULL,
     returnn BOOLEAN NOT NULL
 )';
 

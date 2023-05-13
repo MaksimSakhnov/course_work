@@ -96,7 +96,8 @@ if($result->num_rows > 0){
         $student_specs = mysqli_query($link, $sql);
         if ($student_specs->num_rows > 0){
             while ($student = $student_specs->fetch_assoc()){
-                echo $student['spec'] . "<br>";
+                if ($student['spec'] === $chosen_spec) continue; // чтобы текущее не показывалось
+                echo $student['department'] . " / " . $student['spec'] . "<br>";
             }
         }
         echo "</td>";
