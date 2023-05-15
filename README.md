@@ -16,6 +16,7 @@
 В таблице studetns храняться следующие данные:
 <img src="/docs/students_table.png" alt="Alt text" title="Таблица students">
 В таблице exams храняться данные об экзаменах и баллах за них студента. Таблица students связана с таблицей exams кодом студента.
+
 <img src="/docs/exams_table.png" alt="Alt text" title="Таблица students">
 
 # Update
