@@ -1,6 +1,6 @@
 <?php
 
-require('tosql.php');
+require('../update/tosql.php');
 
 $dep = "Механико-математический факультет";
 

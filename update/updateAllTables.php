@@ -30,13 +30,12 @@ if ($result->num_rows > 0) {
         $create = mysqli_query($link, $sql);
 
         // заполнение таблицы
-        $sql = "SELECT prof, fio,code, orig, priorr FROM students WHERE profCode = '{$code['profCode']}'";
+        $sql = "SELECT prof, fio,code, orig, priorr, profCode FROM students WHERE profCode = '{$code['profCode']}'";
         $students_result = mysqli_query($link, $sql);
         if ($students_result->num_rows > 0) {
             while ($student = $students_result->fetch_assoc()) {
                 // считаем баллы
                 $sql = "SELECT * FROM exams WHERE code = '{$student['code']}'";
-                $sum = 0;
                 $rus_ball = 0;
                 $ex1_ball = 0;
                 $ex2_ball = 0;
@@ -46,47 +45,42 @@ if ($result->num_rows > 0) {
                 if ($exam_result->num_rows > 0) {
                     while ($exam = $exam_result->fetch_assoc()) {
                         $ball = (int)$exam['spec'];
-                        if ($exam['subject'] == "Русский язык") {
+                        if ($exam['subject'] === "Русский язык") {
                             $rus_ball = $ball;
-                            $sum += $ball;
-                        } else if ($exam['subject'] == "Индивидуальные достижения") {
+                        } else if ($exam['subject'] === "Индивидуальные достижения") {
                             $individual_ball = $ball;
-                            $sum += $ball;
                         } else {
-                            if ($ex1_ball == 0) {
+                            if ($ex1_ball === 0) {
                                 $ex1_ball = $ball;
-                                $sum += $ball;
-                            } else if ($ex2_ball == 0) {
+                            } else if ($ex2_ball === 0) {
                                 $ex2_ball = $ball;
-                                $sum += $ball;
                             } else {
                                 $ex3_ball = $ball;
-                                $sum += $ball;
                             }
                         }
 
                     }
                 }
 
-                $sum -= min($ex2_ball, $ex3_ball); // чтобы не было суммы 4 предметов
+                $sum = $rus_ball + $ex1_ball + $individual_ball + max($ex2_ball, $ex3_ball);
 
                 // записываем другие направления
                 $other_dir1 = null;
                 $other_dir2 = null;
                 $other_dir3 = null;
                 $other_dir4 = null;
-                $sql = "SELECT DISTINCT profCode from students WHERE fio = '{$student['fio']}'";
+                $sql = "SELECT DISTINCT profCode from students WHERE code = '{$student['code']}'";
                 $profcodes_result = mysqli_query($link, $sql);
                 if ($profcodes_result->num_rows > 0) {
                     while ($profCode = $profcodes_result->fetch_assoc()) {
-                        if ($profCode['profCode'] != $student['profCode']) {
-                            if ($other_dir1 == null) {
+                        if ($profCode['profCode'] !== $student['profCode']) {
+                            if ($other_dir1 === null) {
                                 $other_dir1 = $profCode['profCode'];
-                            } else if ($other_dir2 == null) {
+                            } else if ($other_dir2 === null) {
                                 $other_dir2 = $profCode['profCode'];
-                            }else if ($other_dir3 == null) {
+                            }else if ($other_dir3 === null) {
                                 $other_dir3 = $profCode['profCode'];
-                            }else if ($other_dir4 == null) {
+                            }else if ($other_dir4 === null) {
                                 $other_dir4 = $profCode['profCode'];
                             }
                         }

@@ -1,6 +1,6 @@
 <?php
 
-require('tosql.php');
+require('../update/tosql.php');
 
 if (file_exists('29072021.xml')) {
     $xml = simplexml_load_file('29072021.xml');

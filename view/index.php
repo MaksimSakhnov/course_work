@@ -1,6 +1,9 @@
 <?php
 $link = mysqli_connect("localhost", "root", "", "students_db");
-$sql_select = "SELECT * FROM `000000465` ORDER BY ball_summ DESC"; // Выбираем таблицу из которой читать данные
+
+$chosen_spec = '000000465';
+
+$sql_select = "SELECT * FROM `$chosen_spec` ORDER BY ball_summ DESC, ekz1 DESC, ekz2 DESC, ekz3 DESC, rus DESC, fio DESC"; // Выбираем таблицу из которой читать данные
 $result = mysqli_query($link, $sql_select);
 
 ?>
@@ -65,27 +68,20 @@ $result = mysqli_query($link, $sql_select);
                 <?php echo $student['priorr']; ?>
             </td>
             <td>
-
-
-
+                <div class="accordion_block">
+                <button class="accordion"><?php echo "<div class='accordion_title'> Другие направления </div>";?></button>
+                <div class="panel">
                 <?php
 
                 if ($student['other_dir1']) {
-                    $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir1']}` where fio = '{$student['fio']}'";
+                    $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir1']}` WHERE fio = '{$student['fio']}'";
                     $other_directions = mysqli_query($link, $sql);
                     if ($other_directions->num_rows > 0) {
                         while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            ?>
-                <div class="accordion_block">
-                <button class="accordion"><?php echo "<div class='accordion_title'>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['priorr'], "</div>";?></button>
-
-                <div class="panel">
-                    <?php
-
+                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['priorr'], "</p>";
                             break;
                         }
                     }
-
                 }
                 if ($student['other_dir2']) {
                     $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir2']}` WHERE fio = '{$student['fio']}'";
@@ -96,7 +92,6 @@ $result = mysqli_query($link, $sql_select);
                             break;
                         }
                     }
-
                 }
                 if ($student['other_dir3']) {
                     $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir3']}` where fio = '{$student['fio']}'";
@@ -107,7 +102,6 @@ $result = mysqli_query($link, $sql_select);
                             break;
                         }
                     }
-
                 }
                 if ($student['other_dir4']) {
                     $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir4']}` where fio = '{$student['fio']}'";
@@ -118,12 +112,8 @@ $result = mysqli_query($link, $sql_select);
                             break;
                         }
                     }
-
                 }
-
-
                 ?>
-
                 </div>
                 </div>
             </td>
