@@ -3,7 +3,7 @@ $link = mysqli_connect("localhost", "root", "", "students_db");
 
 $chosen_spec = '000000465';
 
-$sql_select = "SELECT * FROM `$chosen_spec` ORDER BY ball_summ DESC, ekz1 DESC, ekz2 DESC, ekz3 DESC, rus DESC, fio DESC"; // Выбираем таблицу из которой читать данные
+$sql_select = "SELECT * FROM `$chosen_spec`"; // Выбираем таблицу из которой читать данные
 $result = mysqli_query($link, $sql_select);
 
 ?>
@@ -32,13 +32,12 @@ $result = mysqli_query($link, $sql_select);
         <th>Другие направления</th>
     </tr>
     <?php
-    $num = 1;
     while ($student = mysqli_fetch_assoc($result)) {
 
         ?>
         <tr>
             <td>
-                <?php echo $num; ?>
+                <?php echo $student['rateNum']; ?>
             </td>
             <td>
                 <?php echo $student['fio']; ?>
@@ -69,46 +68,46 @@ $result = mysqli_query($link, $sql_select);
             </td>
             <td>
                 <div class="accordion_block">
-                <button class="accordion"><?php echo "<div class='accordion_title'> Другие направления </div>";?></button>
+                <button class="accordion"><?php echo "<div class='accordion_title'> Направление / Подан оригинал / Место </div>";?></button>
                 <div class="panel">
                 <?php
 
                 if ($student['other_dir1']) {
-                    $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir1']}` WHERE fio = '{$student['fio']}'";
+                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir1']}` WHERE fio = '{$student['fio']}'";
                     $other_directions = mysqli_query($link, $sql);
                     if ($other_directions->num_rows > 0) {
                         while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['priorr'], "</p>";
+                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
                             break;
                         }
                     }
                 }
                 if ($student['other_dir2']) {
-                    $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir2']}` WHERE fio = '{$student['fio']}'";
+                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir2']}` WHERE fio = '{$student['fio']}'";
                     $other_directions = mysqli_query($link, $sql);
                     if ($other_directions->num_rows > 0) {
                         while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['priorr'], "</p>";
+                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
                             break;
                         }
                     }
                 }
                 if ($student['other_dir3']) {
-                    $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir3']}` where fio = '{$student['fio']}'";
+                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir3']}` where fio = '{$student['fio']}'";
                     $other_directions = mysqli_query($link, $sql);
                     if ($other_directions->num_rows > 0) {
                         while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['priorr'], "</p>";
+                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
                             break;
                         }
                     }
                 }
                 if ($student['other_dir4']) {
-                    $sql = "SELECT prof, orig, priorr FROM `{$student['other_dir4']}` where fio = '{$student['fio']}'";
+                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir4']}` where fio = '{$student['fio']}'";
                     $other_directions = mysqli_query($link, $sql);
                     if ($other_directions->num_rows > 0) {
                         while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['priorr'], "</p>";
+                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
                             break;
                         }
                     }
@@ -119,7 +118,6 @@ $result = mysqli_query($link, $sql_select);
             </td>
         </tr>
         <?php
-        $num++;
     }
 
     ?>
