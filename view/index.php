@@ -1,9 +1,16 @@
 <?php
 $link = mysqli_connect("localhost", "root", "", "students_db");
 
-$chosen_spec = '000000465';
+$chosen_spec = '000000828';
 
-$sql_select = "SELECT * FROM `$chosen_spec`"; // Выбираем таблицу из которой читать данные
+$original = true;
+
+if ($original){
+    $sql_select = "SELECT * FROM `$chosen_spec` WHERE orig = 1"; // Выбираем таблицу из которой читать данные
+}
+else{
+    $sql_select = "SELECT * FROM `$chosen_spec`";
+}
 $result = mysqli_query($link, $sql_select);
 
 ?>
@@ -32,12 +39,13 @@ $result = mysqli_query($link, $sql_select);
         <th>Другие направления</th>
     </tr>
     <?php
+    $num = 0;
     while ($student = mysqli_fetch_assoc($result)) {
-
+        $num++;
         ?>
         <tr>
             <td>
-                <?php echo $student['rateNum']; ?>
+                <?php echo $num; ?>
             </td>
             <td>
                 <?php echo $student['fio']; ?>
