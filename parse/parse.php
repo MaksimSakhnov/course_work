@@ -2,6 +2,25 @@
 
 require('../update/tosql.php');
 
+$examCodes = array(
+    'Творческое испытание' => "000",
+    'Русский язык' => "001",
+    'Химия' => "002",
+    'Биология' => "003",
+    'Обществознание' => "004",
+    'География' => "005",
+    'Математика' => "006",
+    'Физика' => "007",
+    'Информатика и ИКТ' => "008",
+    'История' => "009",
+    'Литература' => "010",
+    'Профессиональное испытание' => "011",
+    'Иностранный язык' => "012",
+    'Английский язык' => "013",
+    'Немецкий язык' => "014",
+    'Индивидуальные достижения' => "040",
+);
+
 if (file_exists('29072021.xml')) {
     $xml = simplexml_load_file('29072021.xml');
     $spisok = array();
@@ -16,11 +35,37 @@ if (file_exists('29072021.xml')) {
                     if (is_array($sostav)) {
                         foreach ($sostav as $sostavIndex => $subject) {
                             $subject = (array)$subject;
-                            $examPoints[$chel['Абитуриент']['ВнутреннийКод']][$subject['Предмет']] = (int)$subject['Балл'];
+                            $examName = "";
+                            if (strpos($subject['Предмет'], "Русский") === false && strpos($subject['Предмет'], "язык") !== false){
+                                $examName = "Иностранный язык";
+                            }
+                            else if (strpos($subject['Предмет'], "Профессиональное испытание") !== false){
+                                $examName = "Профессиональное испытание";
+                            }
+                            else if (strpos($subject['Предмет'], "Творческое испытание") !== false){
+                                $examName = "Творческое испытание";
+                            }
+                            else {
+                                $examName = $subject['Предмет'];
+                            }
+                            $examPoints[$chel['Абитуриент']['ВнутреннийКод']][$examCodes[$examName]] = (int)$subject['Балл'];
                         }
                     } else {
                         $sostav = (array)$sostav;
-                        $examPoints[$chel['Абитуриент']['ВнутреннийКод']][$sostav['Предмет']] = (int)$sostav['Балл'];
+                        $examName = "";
+                        if (strpos($sostav['Предмет'], "Русский") === false && strpos($subject['Предмет'], "язык") !== false){
+                            $examName = "Иностранный язык";
+                        }
+                        else if (strpos($sostav['Предмет'], "Профессиональное испытание") !== false){
+                            $examName = "Профессиональное испытание";
+                        }
+                        else if (strpos($sostav['Предмет'], "Творческое испытание") !== false){
+                            $examName = "Творческое испытание";
+                        }
+                        else {
+                            $examName = $sostav['Предмет'];
+                        }
+                        $examPoints[$chel['Абитуриент']['ВнутреннийКод']][$examCodes[$examName]] = (int)$sostav['Балл'];
                     }
                 }
                 unset($chel[$field]);

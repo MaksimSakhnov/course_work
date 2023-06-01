@@ -17,7 +17,7 @@ $sortedExamResults = array();
 if ($exam_result->num_rows > 0){
     while ($exam = $exam_result->fetch_assoc()){
         $sortedExamResults[$exam['code']][] = array(
-            'name' => $exam['subject'],
+            'examCode' => $exam['subject'],
             'rating' => (int)$exam['spec'],
         );
     }
@@ -32,6 +32,24 @@ if ($profcodes_result->num_rows > 0){
     }
 }
 
+$sql = "SELECT * FROM directions";
+$directions_result = mysqli_query($link, $sql);
+$sortedDirections = array();
+if ($directions_result->num_rows > 0){
+    while ($dir = $directions_result->fetch_assoc()){
+        $sortedDirections[$dir['specID']] = array(
+            'exam1' => $dir['exam1'],
+            'exam2' => $dir['exam2'],
+            'examAlt' => $dir['examAlt'],
+            'spo1' => $dir['spo1'],
+            'spo1Alt' => $dir['spo1Alt'],
+            'spo2' => $dir['spo2'],
+            'spo2Alt' => $dir['spo2Alt'],
+            'altIsMain' => (BOOLEAN)$dir['altExIsMain'],
+        );
+    }
+}
+
 foreach ($profCodes_form_file as $tmp => $chosen_spec){
     // заполнение таблицы
     $sql = "DROP TABLE IF EXISTS `$chosen_spec`";
@@ -42,9 +60,9 @@ foreach ($profCodes_form_file as $tmp => $chosen_spec){
             fio VARCHAR(50) NOT NULL,
             ball_summ  SMALLINT NOT NULL,
             rus SMALLINT NOT NULL,
-            ekz1 SMALLINT Not NULL,
-            ekz2 SMALLINT Not NULL,
-            ekz3 SMALLINT Not NULL,
+            exam1 SMALLINT Not NULL,
+            exam2 SMALLINT Not NULL,
+            examAlt SMALLINT Not NULL,
             achievements SMALLINT Not NULL,
             orig BOOLEAN NOT NULL,
             priorr  SMALLINT NOT NULL,
@@ -66,29 +84,52 @@ foreach ($profCodes_form_file as $tmp => $chosen_spec){
             $rus_ball = 0;
             $ex1_ball = 0;
             $ex2_ball = 0;
-            $ex3_ball = 0;
+            $exAlt_ball = 0;
+            $exAlt2_ball = 0; // на случай четырех СПО
             $individual_ball = 0;
+            $spo = false;
             
             if (isset($sortedExamResults[$student['code']])){
                 foreach ($sortedExamResults[$student['code']] as $inidex => $subject) {
                     $ball = $subject['rating'];
-                    if ($subject['name'] === "Русский язык") {
+                    if ($subject['examCode'] === "001") {
                         $rus_ball = $ball;
-                    } else if ($subject['name'] === "Индивидуальные достижения") {
+                    } else if ($subject['examCode'] === "040") {
                         $individual_ball = $ball;
-                    } else {
-                        if ($ex1_ball === 0) {
-                            $ex1_ball = $ball;
-                        } else if ($ex2_ball === 0) {
-                            $ex2_ball = $ball;
-                        } else {
-                            $ex3_ball = $ball;
-                        }
+                    } else if ($subject['examCode'] === $sortedDirections[$chosen_spec]['exam1']){
+                        $ex1_ball = $ball;
+                    } else if ($subject['examCode'] === $sortedDirections[$chosen_spec]['exam2']){
+                        $ex2_ball = $ball;
+                    } else if ($subject['examCode'] === $sortedDirections[$chosen_spec]['examAlt']){
+                        $exAlt_ball = $ball;
+                    } else if ($subject['examCode'] === $sortedDirections[$chosen_spec]['spo1']){
+                        $ex1_ball = $ball;
+                        $spo = true;
+                    } else if ($subject['examCode'] === $sortedDirections[$chosen_spec]['spo2']){
+                        $ex2_ball = $ball;
+                        $spo = true;
+                    } else if ($subject['examCode'] === $sortedDirections[$chosen_spec]['spo1Alt']){
+                        $exAlt_ball = $ball;
+                        $spo = true;
+                    } else if ($subject['examCode'] === $sortedDirections[$chosen_spec]['spo2Alt']){
+                        $exAlt2_ball = $ball;
+                        $spo = true;
                     }
                 }
             }
 
-            $sum = $rus_ball + $ex1_ball + $individual_ball + max($ex2_ball, $ex3_ball);
+            $sum = $rus_ball + $individual_ball;
+            if (!$spo){
+                if ($sortedDirections[$chosen_spec]['altIsMain']){
+                    $sum += max($ex1_ball, $exAlt_ball) + $ex2_ball;
+                }
+                else {
+                    $sum += max($ex2_ball, $exAlt_ball) + $ex1_ball;
+                }
+            }
+            else {
+                $sum += max($ex1_ball, $exAlt_ball) + max($ex2_ball, $exAlt2_ball);
+            }
 
             // записываем другие направления
             $other_dir1 = null;
@@ -115,9 +156,9 @@ foreach ($profCodes_form_file as $tmp => $chosen_spec){
                 'fio' => $student['fio'],
                 'ball_summ' => $sum,
                 'rus' => $rus_ball,
-                'ekz1' => $ex1_ball,
-                'ekz2' => $ex2_ball,
-                'ekz3' => $ex3_ball,
+                'exam1' => $ex1_ball,
+                'exam2' => $ex2_ball,
+                'examAlt' => $exAlt_ball,
                 'achievements' => $individual_ball,
                 'orig' => $student['orig'],
                 'priorr' => $student['priorr'],
@@ -125,6 +166,7 @@ foreach ($profCodes_form_file as $tmp => $chosen_spec){
                 'other_dir2' =>$other_dir2,
                 'other_dir3' =>$other_dir3,
                 'other_dir4' =>$other_dir4,
+                'altIsMain' => $sortedDirections[$chosen_spec]['altIsMain'],
             );
         }
 
@@ -134,16 +176,27 @@ foreach ($profCodes_form_file as $tmp => $chosen_spec){
                 return ($a['ball_summ'] < $b['ball_summ']) ? 1 : -1;
             }
 
-            if ($a['ekz1'] !== $b['ekz1']){
-                return ($a['ekz1'] < $b['ekz1']) ? 1 : -1;
+            if ($a['exam1'] !== $b['exam1']){
+                return ($a['exam1'] < $b['exam1']) ? 1 : -1;
             }
 
-            if ($a['ekz2'] !== $b['ekz2']){
-                return ($a['ekz2'] < $b['ekz2']) ? 1 : -1;
-            }
+            if ($a['altIsMain']){
+                if ($a['examAlt'] !== $b['examAlt']){
+                    return ($a['examAlt'] < $b['examAlt']) ? 1 : -1;
+                }
 
-            if ($a['ekz3'] !== $b['ekz3']){
-                return ($a['ekz3'] < $b['ekz3']) ? 1 : -1;
+                if ($a['exam2'] !== $b['exam2']){
+                    return ($a['exam2'] < $b['exam2']) ? 1 : -1;
+                }
+            }
+            else {
+                if ($a['exam2'] !== $b['exam2']){
+                    return ($a['exam2'] < $b['exam2']) ? 1 : -1;
+                }
+
+                if ($a['examAlt'] !== $b['examAlt']){
+                    return ($a['examAlt'] < $b['examAlt']) ? 1 : -1;
+                }
             }
 
             if ($a['rus'] !== $b['rus']){
@@ -169,9 +222,9 @@ foreach ($profCodes_form_file as $tmp => $chosen_spec){
                     '{$student['fio']}',
                     '{$student['ball_summ']}',
                     '{$student['rus']}',
-                    '{$student['ekz1']}',
-                    '{$student['ekz2']}',
-                    '{$student['ekz3']}',
+                    '{$student['exam1']}',
+                    '{$student['exam2']}',
+                    '{$student['examAlt']}',
                     '{$student['achievements']}',
                     '{$student['orig']}',
                     '{$student['priorr']}',

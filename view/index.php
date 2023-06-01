@@ -1,9 +1,9 @@
 <?php
 $link = mysqli_connect("localhost", "root", "", "students_db");
 
-$chosen_spec = '000000828';
+$chosen_spec = '000000360';
 
-$original = true;
+$original = false;
 
 if ($original){
     $sql_select = "SELECT * FROM `$chosen_spec` WHERE orig = 1"; // Выбираем таблицу из которой читать данные
@@ -33,7 +33,7 @@ $result = mysqli_query($link, $sql_select);
         <th>Экз1</th>
         <th>Экз2</th>
         <th>Экз3</th>
-        <th>Инд. достиж</th>
+        <th>Инд. достиж.</th>
         <th>Оригинал</th>
         <th>Приоритет</th>
         <th>Другие направления</th>
@@ -57,13 +57,13 @@ $result = mysqli_query($link, $sql_select);
                 <?php echo $student['rus']; ?>
             </td>
             <td>
-                <?php echo $student['ekz1']; ?>
+                <?php echo $student['exam1']; ?>
             </td>
             <td>
-                <?php echo $student['ekz2']; ?>
+                <?php echo $student['exam2']; ?>
             </td>
             <td>
-                <?php echo $student['ekz3']; ?>
+                <?php echo $student['examAlt']; ?>
             </td>
             <td>
                 <?php echo $student['achievements']; ?>
