@@ -1,15 +1,15 @@
 <?php
 $link = mysqli_connect("localhost", "root", "", "students_db");
 
-$chosen_spec = '000000360';
+$chosen_spec = 1;
 
 $original = false;
 
 if ($original){
-    $sql_select = "SELECT * FROM `$chosen_spec` WHERE orig = 1"; // Выбираем таблицу из которой читать данные
+    $sql_select = "SELECT * FROM ssu_abit_spisok_datamart WHERE id_grp = $chosen_spec, original = 1";
 }
 else{
-    $sql_select = "SELECT * FROM `$chosen_spec`";
+    $sql_select = "SELECT * FROM ssu_abit_spisok_datamart WHERE id_grp = $chosen_spec";
 }
 $result = mysqli_query($link, $sql_select);
 
@@ -27,15 +27,13 @@ $result = mysqli_query($link, $sql_select);
 <table>
     <tr>
         <th>№</th>
-        <th>ФИО</th>
+        <th>СНИЛС</th>
         <th>Сумма баллов</th>
-        <th>Русский язык</th>
-        <th>Экз1</th>
-        <th>Экз2</th>
-        <th>Экз3</th>
-        <th>Инд. достиж.</th>
+        <th>Испытание 1</th>
+        <th>Испытание 2</th>
+        <th>Испытание 3</th>
+        <th>Индивидуальные достижения</th>
         <th>Оригинал</th>
-        <th>Приоритет</th>
         <th>Другие направления</th>
     </tr>
     <?php
@@ -51,10 +49,7 @@ $result = mysqli_query($link, $sql_select);
                 <?php echo $student['fio']; ?>
             </td>
             <td>
-                <?php echo $student['ball_summ']; ?>
-            </td>
-            <td>
-                <?php echo $student['rus']; ?>
+                <?php echo $student['points_sum']; ?>
             </td>
             <td>
                 <?php echo $student['exam1']; ?>
@@ -63,62 +58,31 @@ $result = mysqli_query($link, $sql_select);
                 <?php echo $student['exam2']; ?>
             </td>
             <td>
-                <?php echo $student['examAlt']; ?>
+                <?php echo $student['exam3']; ?>
             </td>
             <td>
                 <?php echo $student['achievements']; ?>
             </td>
             <td>
-                <?php echo $student['orig']; ?>
-            </td>
-            <td>
-                <?php echo $student['priorr']; ?>
+                <?php echo $student['original']; ?>
             </td>
             <td>
                 <div class="accordion_block">
-                <button class="accordion"><?php echo "<div class='accordion_title'> Направление / Подан оригинал / Место </div>";?></button>
+                <button class="accordion"><?php echo "<div class='accordion_title'> Название направления </div>";?></button>
                 <div class="panel">
                 <?php
 
                 if ($student['other_dir1']) {
-                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir1']}` WHERE fio = '{$student['fio']}'";
-                    $other_directions = mysqli_query($link, $sql);
-                    if ($other_directions->num_rows > 0) {
-                        while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
-                            break;
-                        }
-                    }
+                    echo "<p>" . explode(';', $student['other_dir1'])[0] . "</p>";
                 }
                 if ($student['other_dir2']) {
-                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir2']}` WHERE fio = '{$student['fio']}'";
-                    $other_directions = mysqli_query($link, $sql);
-                    if ($other_directions->num_rows > 0) {
-                        while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
-                            break;
-                        }
-                    }
+                    echo "<p>" . explode(';', $student['other_dir2'])[0] . "</p>";
                 }
                 if ($student['other_dir3']) {
-                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir3']}` where fio = '{$student['fio']}'";
-                    $other_directions = mysqli_query($link, $sql);
-                    if ($other_directions->num_rows > 0) {
-                        while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
-                            break;
-                        }
-                    }
+                    echo "<p>" . explode(';', $student['other_dir3'])[0] . "</p>";
                 }
                 if ($student['other_dir4']) {
-                    $sql = "SELECT prof, orig, rateNum FROM `{$student['other_dir4']}` where fio = '{$student['fio']}'";
-                    $other_directions = mysqli_query($link, $sql);
-                    if ($other_directions->num_rows > 0) {
-                        while ($dir = mysqli_fetch_assoc($other_directions)) {
-                            echo "<p>" .$dir['prof'], " / " . $dir['orig'], " / " . $dir['rateNum'], "</p>";
-                            break;
-                        }
-                    }
+                    echo "<p>" . explode(';', $student['other_dir4'])[0] . "</p>";
                 }
                 ?>
                 </div>
