@@ -13,6 +13,22 @@ else{
 }
 $result = mysqli_query($link, $sql_select);
 
+$sql_select = "SELECT all_exams FROM ssu_abit_spisok_header_exams WHERE id_grp = $chosen_spec";
+$examInfoSelect = mysqli_fetch_assoc(mysqli_query($link, $sql_select));
+
+// крч тут список экзов разбивается по испытаниям и записывается в строку в виде маркированного списка, чтобы потом вывести это в подсказке
+$examInfo = array(1 => "", 2 => "", 3 => "", 4 => "");
+$tmpExamInfo = array_map(function($x) {return explode(':', $x);}, explode(';', $examInfoSelect['all_exams']));
+unset($examInfoSelect);
+foreach($tmpExamInfo as $index => $exam){
+    $examInfo[(int)$exam[0]] = "<ul>" . implode('', array_map(function($x) {
+        $x = trim($x, " /()");
+        return ($x !== "") ? "<li>" . $x . "</li>" : "";
+    }, preg_split("/(?<=\()|(?=\))/", $exam[1]))) . "</ul>";
+}
+
+var_dump($examInfo);
+/*<?php echo $examInfo[1] ?>*/
 ?>
 
 <!DOCTYPE html>
